@@ -18,7 +18,7 @@ clean: Makefile.coq #Lib/Makefile.coq
 #	rm -f Lib/Makefile.coq
 
 Makefile.coq: _CoqProject Makefile
-	coq_makefile -f _CoqProject ./CategoricalSemantics/*.v -o Makefile.coq
+	coq_makefile -f _CoqProject ./HindleyMilner/*.v -o Makefile.coq
 
 Lib/Makefile.coq: _CoqProject Makefile
 	cd Lib && coq_makefile -f _CoqProject *.v -o Makefile.coq

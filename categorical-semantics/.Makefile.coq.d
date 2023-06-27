@@ -1,6 +1,6 @@
-./HindleyMilner/HindleyMilner.vo ./HindleyMilner/HindleyMilner.glob ./HindleyMilner/HindleyMilner.v.beautified ./HindleyMilner/HindleyMilner.required_vo: ./HindleyMilner/HindleyMilner.v ./HindleyMilner/Maps.vo
-./HindleyMilner/HindleyMilner.vio: ./HindleyMilner/HindleyMilner.v ./HindleyMilner/Maps.vio
-./HindleyMilner/HindleyMilner.vos ./HindleyMilner/HindleyMilner.vok ./HindleyMilner/HindleyMilner.required_vos: ./HindleyMilner/HindleyMilner.v ./HindleyMilner/Maps.vos
-./HindleyMilner/Maps.vo ./HindleyMilner/Maps.glob ./HindleyMilner/Maps.v.beautified ./HindleyMilner/Maps.required_vo: ./HindleyMilner/Maps.v 
-./HindleyMilner/Maps.vio: ./HindleyMilner/Maps.v 
-./HindleyMilner/Maps.vos ./HindleyMilner/Maps.vok ./HindleyMilner/Maps.required_vos: ./HindleyMilner/Maps.v 
+./CategoricalSemantics/CategoricalSemantics.vo ./CategoricalSemantics/CategoricalSemantics.glob ./CategoricalSemantics/CategoricalSemantics.v.beautified ./CategoricalSemantics/CategoricalSemantics.required_vo: ./CategoricalSemantics/CategoricalSemantics.v ./CategoricalSemantics/Maps.vo
+./CategoricalSemantics/CategoricalSemantics.vio: ./CategoricalSemantics/CategoricalSemantics.v ./CategoricalSemantics/Maps.vio
+./CategoricalSemantics/CategoricalSemantics.vos ./CategoricalSemantics/CategoricalSemantics.vok ./CategoricalSemantics/CategoricalSemantics.required_vos: ./CategoricalSemantics/CategoricalSemantics.v ./CategoricalSemantics/Maps.vos
+./CategoricalSemantics/Maps.vo ./CategoricalSemantics/Maps.glob ./CategoricalSemantics/Maps.v.beautified ./CategoricalSemantics/Maps.required_vo: ./CategoricalSemantics/Maps.v 
+./CategoricalSemantics/Maps.vio: ./CategoricalSemantics/Maps.v 
+./CategoricalSemantics/Maps.vos ./CategoricalSemantics/Maps.vok ./CategoricalSemantics/Maps.required_vos: ./CategoricalSemantics/Maps.v 

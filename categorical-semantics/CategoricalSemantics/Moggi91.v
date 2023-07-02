@@ -8,10 +8,11 @@ From Coq.Strings Require Export String.
 From Coq.Lists Require Export List.
 From Coq.Arith Require Export Peano_dec.
 
+Require Import Category.Theory.
+
 (* ====================================================== *)
 (* ====================================================== *)
 Module MultiSortedMonadic.
-
 
 (* ---- parameters to the equational theory ------------- *)
 
@@ -55,7 +56,7 @@ Inductive has_sig : FnSym -> typ -> typ -> Prop :=
 
 (* ---- type judgements --------------------------------- *)
 
-(* term e has type t in single-variable context (x:A) *)
+(* term e has type t2 in single-variable context (x : t1) *)
 Reserved Notation "x : t1 |- e : t2" (no associativity, at level 90, e at next level).
 
 (* term has type in a (single-variable) context *)
@@ -69,18 +70,43 @@ Inductive has_type : ctx -> tm -> typ -> Prop :=
 
 (* ---- type equality ----------------------------------- *)
 
-(* term e has type t in single-variable context (x:A) *)
+(* terms e1 and e2 of type t2 are equivalent *)
+(* in single-variable context (x : t1)       *)
 Reserved Notation "x : t1 |- e1 =[ t2 ]= e2" (no associativity, at level 90, e1 at next level, e2 at next level).
 
 (* describes when an equality term is well-typed *)
-Inductive eq_well_typed : ctx -> typ ->tm -> tm -> Prop :=
+(* Inductive eq_term_well_typed : ctx -> typ ->tm -> tm -> Prop :=
   | EqTm : forall (x: var) (e1 e2 : tm) (A1 A2 : typ),
     (x : A1 |- e1 : A2) ->
     (x : A1 |- e2 : A2) ->
     (x : A1 |- e1 =[ A2 ]= e2)
-  where "x : t1 |- e1 =[ t2 ]= e2" := (eq_tm (x,t1) t2 e1 e2).
+  where "x : t1 |- e1 =[ t2 ]= e2" := (eq_well_typed (x,t1) t2 e1 e2). *)
+
+Inductive eq_term : ctx -> typ -> tm -> tm -> Prop :=
+  | EqTm_Refl : forall (x : var) (e : tm) (A1 A2 : typ),
+      (x : A1 |- e : A2) ->
+      (x : A1 |- e =[ A2 ]= e)
+  | EqTm_Symm : forall (x : var) (e1 e2 : tm) (A1 A2 : typ),
+      (x : A1 |- e1 =[ A2 ]= e2) ->
+      (x : A1 |- e2 =[ A2 ]= e1)
+  | EqTm_Trans : forall (x : var) (e1 e2 e3 : tm) (A1 A2 : typ),
+      (x : A1 |- e1 =[ A2 ]= e2) ->
+      (x : A1 |- e2 =[ A2 ]= e3) ->
+      (x : A1 |- e1 =[ A2 ]= e3)
+  | EqTm_Congr : forall (x : var) (e1 e2 e3 : tm) (A1 A2 A3 : typ) (f : FnSym),
+      (f : A2 --> A3) ->
+      (x : A1 |-           e1  =[ A2 ]=           e2) ->
+      (x : A1 |- (tm_fap f e1) =[ A3 ]= (tm_fap f e2))
+  (* TODO: EqTerm_Subst *)
+  where "x : t1 |- e1 =[ t2 ]= e2" := (eq_term (x,t1) t2 e1 e2).
+
 
 (* ====================================================== *)
+
+Program Definition Interp : Category := {|
+  obj := typ ;
+  hom (A B : typ) := True
+|}.
 
 End MultiSortedMonadic.
 (* ====================================================== *)

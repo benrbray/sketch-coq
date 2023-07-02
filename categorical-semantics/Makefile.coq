@@ -45,7 +45,7 @@ HASNATDYNLINK     := $(COQMF_HASNATDYNLINK)
 OCAMLWARN         := $(COQMF_WARN)
 
 Makefile.coq.conf: _CoqProject
-	/snap/coq-prover/31/coq-platform/bin/coq_makefile COQBIN = /snap/coq-prover/31/coq-platform/bin/ -f _CoqProject ./CategoricalSemantics/CategoricalSemantics.v ./CategoricalSemantics/Maps.v -o Makefile.coq
+	/snap/coq-prover/31/coq-platform/bin/coq_makefile COQBIN = /snap/coq-prover/31/coq-platform/bin/ -f _CoqProject ./CategoricalSemantics/HindleyMilner.v ./CategoricalSemantics/Maps.v ./CategoricalSemantics/Moggi91.v -o Makefile.coq
 
 # This file can be created by the user to hook into double colon rules or
 # add any other Makefile code he may need

@@ -1,4 +1,5 @@
 -docroot ./docs
 -R ./CategoricalSemantics CategoricalSemantics
+-R ./Spitters2011 Spitters2011
 -R /home/benjamin/oss/category-theory Category
 -R ./LearnCoq LearnCoq

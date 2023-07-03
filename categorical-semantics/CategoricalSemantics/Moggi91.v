@@ -25,8 +25,8 @@ Parameter FnResTy : FnSym -> A. (* function result type   *)
 
 (* ---- syntax ------------------------------------------ *)
 
-Definition var := string.        (* variables         *)
-Definition var_eq := string_dec. (* variable equality *)
+Definition var : Type := Coq.Init.Datatypes.unit. (* variable (no names!) *)
+Definition var_eq := string_dec.                  (* variable equality    *)
 
 (* the only types are base types *)
 Inductive typ : Type :=
@@ -131,10 +131,31 @@ Inductive eq_term : ctx -> typ -> tm -> tm -> Prop :=
 
 (* TODO: passing around fsig is cumbersome, is there a better term representation? *)
 
-(* setoid for terms, based on eq_term *)
-(* Instance tm_setoid : Setoid tm := {
+(* ====================================================== *)
 
-}. *)
+(* a term, along with a proof of a typing judgement *)
+(* x : A1 |- *)
+Inductive typed_tm : typ -> typ -> Type :=
+  | TypedTm : forall {A1 A2 : typ} (e : tm), (tt : A1 |- e : A2) -> typed_tm A1 A2.
+
+Check Reflexive.
+
+(* setoid for terms, based on eq_term *)
+#[refine] #[export]
+Instance tm_setoid {A1 A2} : Setoid (typed_tm A1 A2) := {
+  equiv :=
+    (fun t1 t2 => 
+      match (t1, t2) with
+      | (TypedTm e1 _, TypedTm e2 _) => eq_term (tt, A1) A2 e1 e2
+      end);
+}.
+Proof.
+  constructor.
+  - (* Reflexive *) unfold Reflexive. simpl.
+  - (* Symmetric *)
+  - (* Transitive *)
+
+Next Obligation.
 
 (* ====================================================== *)
 
@@ -144,6 +165,7 @@ Program Definition Interp : Category := {|
   obj := typ ;
   hom (A B : typ) := tm ;
 |}.
+Next Obligation.
 
 End MultiSortedMonadic.
 (* ====================================================== *)

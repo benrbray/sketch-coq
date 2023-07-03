@@ -71,4 +71,17 @@ Admitted.
 End SemiGroup_OperationalTypeClass.
 (* ====================================================== *)
 (* ====================================================== *)
+Module S4_1_ImplicitSyntaxDirectedAlgorithmComposition.
+
+Class Decision (P : Prop) : Type := decide : sumbool P (not P).
+
+#[export]
+Instance decide_conj `{Decision P} `{Decision Q}: Decision (P /\ Q).
+Proof.
+  destruct H as [HP|HnotP]; destruct H0 as [HQ|HnotQ];
+    try (left ; tauto);
+    try (right; tauto).
+Qed.
+
+End S4_1_ImplicitSyntaxDirectedAlgorithmComposition.
 

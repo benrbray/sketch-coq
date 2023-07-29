@@ -26,12 +26,6 @@ Inductive tp : Type :=
   | tp_var   : var_tp -> tp
   | tp_arrow : tp -> tp -> tp.
 
-(* a TYPE SCHEME is a type wrapped in one *)
-(* or more universally-quantified variables *)
-Inductive scheme : Type :=
-  | sc_type   : tp -> scheme
-  | sc_forall : string -> scheme.
-
 (* ====================================================== *)
 
 Declare Custom Entry hindley_milner.
@@ -69,12 +63,60 @@ Example term_example_1 :=
 
 (* ====================================================== *)
 
-Inductive ctx : Type :=
+(* "ordinal n" represents an integer 0 <= x < n *)
+Record ordinal n := {
+  val :> nat;
+  _ : val < n;
+}.
+
+(* a TYPE SCHEME is a type wrapped in one *)
+(* or more universally-quantified variables *)
+Inductive scheme : Type :=
+  | sch_metavar : nat -> scheme            (* mention metavariable *)
+  | sch_type    : tp  -> scheme            (* type *)
+  | sch_forall  : nat -> scheme -> scheme. (* universal quantification *)
+
+(* ctx m n = context with        *)
+(*   m metavariables and         *)
+(*   n term variables            *)
+Inductive ctx : nat -> nat -> Type :=
+  | ctx_empty :
+      ctx 0 0
+  | ctx_metavar_intro {m n : nat} :
+      (* extend ctx with additional metavar *)
+      ctx m n -> ctx (m+1) n
+  | ctx_metavar_dfn {m n : nat} :
+      (* extend ctx with metavar, defined equal to some type *)
+      ctx m n -> tp -> ctx (m+1) n
+  | ctx_var_annotate {m n : nat}:
+      (* extend ctx with term-level var *)
+      ctx m n -> scheme -> ctx m (n+1).
+
+Definition metavar {m n : nat} (G: ctx m n) := ordinal m.
+
+(* ==== valid scheme ==================================== *)
+
+(* valid_scheme notation *)
+Reserved Notation "G ⊢s t" (no associativity, at level 90, t at next level).
+
+Inductive valid_scheme {m n : nat} (G : ctx m n): scheme -> Prop :=
+  | valid_sch_metavar {x : metavar G} :
+      G ⊢s (sch_metavar x)
+  | valid_sch_arrow : forall (a b : tp),
+      G ⊢s (sch_type a) ->
+      G ⊢s (sch_type b) ->
+      G ⊢s (sch_type (tp_arrow a b))
+  | valid_sch_forall : forall (x : scheme),
+      (ctx_metavar_intro G) ⊢s x ->
+      G ⊢s (sch_forall m x)
+  where "G ⊢s x" := (valid_scheme G x).
+
+(*Inductive ctx : Type :=
   | ctx_empty         : ctx
   | ctx_metavar_intro : ctx -> string -> ctx            (* C, a:*      *)
   | ctx_metavar_dfn   : ctx -> string -> tp -> ctx      (* C, a := t:* *)
   | ctx_var_annotate  : ctx -> string -> scheme -> ctx  (* C, x:s      *)
-  | ctx_locality      : ctx -> ctx.                     (* C ;         *)
+  | ctx_locality      : ctx -> ctx.                     (* C ;         *) *)
 
 (* a context C is valid provided that
      > each variable is distinct

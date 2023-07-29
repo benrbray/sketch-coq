@@ -5,23 +5,32 @@ From HindleyMilner Require Import Maps.
 
 (* ====================================================== *)
 
-(* terms *)
-Inductive tm : Type :=
-  | tm_var : string -> tm
-  | tm_abs : string -> tm -> tm
-  | tm_app : tm -> tm -> tm
-  | tm_let : string -> tm -> tm -> tm.
+(* term vars    x,y                                       *)
+(* type vars    α,β                                       *)
+(* terms        t,s ::= x | λx.t | s t | let x = s in t   *)
+(* types        τ,υ ::= α | τ → υ                         *)
+(* scheme       σ ::= τ | ∀α. σ                           *)
 
-(* types *)
+Notation var_tm := string.
+Notation var_tp := string.
+
+(* term *)
+Inductive tm : Type :=
+  | tm_var : var_tm -> tm
+  | tm_abs : var_tm -> tm -> tm
+  | tm_app : tm -> tm -> tm
+  | tm_let : var_tm -> tm -> tm -> tm.
+
+(* type *)
 Inductive tp : Type :=
-  | tp_var   : string -> tp
+  | tp_var   : var_tp -> tp
   | tp_arrow : tp -> tp -> tp.
 
-(* type schemes *)
+(* a TYPE SCHEME is a type wrapped in one *)
+(* or more universally-quantified variables *)
 Inductive scheme : Type :=
   | sc_type   : tp -> scheme
   | sc_forall : string -> scheme.
-
 
 (* ====================================================== *)
 
@@ -43,6 +52,8 @@ Notation "'let' x ':=' s 'in' t" :=
                   s custom hindley_milner at level 99,
                   t custom hindley_milner at level 99,
                   left associativity).
+
+(* ====================================================== *)
 
 (* shorthand for variables *)
 Definition x : string := "x".
@@ -68,5 +79,21 @@ Inductive ctx : Type :=
 (* a context C is valid provided that
      > each variable is distinct
      > each property is well-formed for the preceeding context *)
-(* Inductive ctx_valid : ctx -> Prop :=
-  |   *)
+
+(* ==== statements in context =========================== *)
+
+(* STATEMENT: an assertion which can be judged in context.*)
+(* Gundry's "sanity conditions" are passed as evidence to *)
+(* each constructor, and can be recovered by inversion.   *)
+
+Inductive stmt : Type :=
+  | stmt_ctx_wf    : stmt                       (* well-formed context *)
+  | stmt_scheme_wf : scheme -> stmt             (* well-formed type scheme *)
+  | stmt_tp_eq     : tp -> tp -> stmt           (* type equivalence *)
+  | stmt_tm_wt     : tm -> tp -> stmt           (* well-typed term *)
+  | stmt_scheme_inst : scheme -> scheme -> stmt (* generic instantiation of type schemes *)
+  | stmt_conj      : stmt -> stmt -> stmt.      (* conjunction of statements *)
+
+Inductive ctx_wf : ctx -> Prop :=
+  | ctx_wf_empty : ctx_wf ctx_empty
+  | .

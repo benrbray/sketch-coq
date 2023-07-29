@@ -90,9 +90,29 @@ Inductive ctx : nat -> nat -> Type :=
       ctx m n -> tp -> ctx (m+1) n
   | ctx_var_annotate {m n : nat}:
       (* extend ctx with term-level var *)
-      ctx m n -> scheme -> ctx m (n+1).
+      ctx m n -> scheme -> ctx m (n+1)
+  | ctx_semicolon {m n : nat}: 
+      ctx m n -> ctx m n.
 
 Definition metavar {m n : nat} (G: ctx m n) := ordinal m.
+
+Reserved Notation "G ∋ x := t" (no associativity, at level 90, x at next level, t at next level).
+
+(* evidence that the metavar assignment *)
+(* "x := t" belongs to the context "G"  *)
+Inductive lookup : forall {m n : nat}, ctx m n -> nat -> tp -> Prop :=
+  | LookupHead : forall {m0 n0 : nat} (G: ctx m0 n0) (t : tp),
+      (ctx_metavar_dfn G t) ∋ m0 := t
+  | LookupRest_intro : forall {m0 n0 x : nat} (G: ctx m0 n0) (t : tp),
+      G ∋ x := t ->
+      (ctx_metavar_intro G) ∋ x := t
+  | LookupRest_ann : forall {m0 n0 x : nat} (G: ctx m0 n0) (t : tp) (s : scheme),
+      G ∋ x := t ->
+      (ctx_var_annotate G s) ∋ x := t
+  | LookupRest_semi : forall {m0 n0 x : nat} (G: ctx m0 n0) (t : tp),
+      G ∋ x := t ->
+      (ctx_semicolon G) ∋ x := t
+  where "G ∋ x := t" := (lookup G x t).
 
 (* ==== valid scheme ==================================== *)
 
@@ -122,6 +142,27 @@ Inductive valid_scheme {m n : nat} (G : ctx m n): scheme -> Prop :=
      > each variable is distinct
      > each property is well-formed for the preceeding context *)
 
+Reserved Notation "G ⊢t t1 ≡ t2" (no associativity, at level 90, t1 at next level, t2 at next level).
+
+(* contextual equality judgements on types may equate     *)
+(*   types with types,                                    *)
+(*   metavariables with metavariables,                    *)
+(*   or metavariables with types                          *)
+Inductive eq_tp {m n : nat} (G : ctx m n) : (tp+nat) -> (tp+nat) -> Prop :=
+  | eq_tp_refl : forall (t : tp+nat),
+      G ⊢t t ≡ t
+  | eq_tp_symm : forall (t v : tp+nat),
+      G ⊢t t ≡ v ->
+      G ⊢t v ≡ t
+  | eq_tp_trans : forall (t0 t1 t2 : tp+nat),
+      G ⊢t t0 ≡ t1 ->
+      G ⊢t t1 ≡ t2 ->
+      G ⊢t t0 ≡ t2
+  | eq_tp_metavar_dfn : forall (x : nat) (t: tp),
+      G ∋ x := t ->
+      G ⊢t (inr x) ≡ (inl t)
+  where "G ⊢t t1 ≡ t2" := (eq_tp G t1 t2).
+
 (* ==== statements in context =========================== *)
 
 (* STATEMENT: an assertion which can be judged in context.*)
@@ -135,7 +176,3 @@ Inductive stmt : Type :=
   | stmt_tm_wt     : tm -> tp -> stmt           (* well-typed term *)
   | stmt_scheme_inst : scheme -> scheme -> stmt (* generic instantiation of type schemes *)
   | stmt_conj      : stmt -> stmt -> stmt.      (* conjunction of statements *)
-
-Inductive ctx_wf : ctx -> Prop :=
-  | ctx_wf_empty : ctx_wf ctx_empty
-  | .
